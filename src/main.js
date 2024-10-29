@@ -34,7 +34,7 @@ $searchForm.onsubmit = async event => {
 
     if (hits?.length) { 
       render.renderImages(hits);
-      $loadMore.hodden = false;
+      $loadMore.hidden = false;
     } else {
       iziToast.error({ 
         message: 'Sorry, there are no images matching your search query. Please try again!',
