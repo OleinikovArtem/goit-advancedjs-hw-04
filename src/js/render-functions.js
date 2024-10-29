@@ -4,23 +4,25 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const $gallery = document.querySelector('.gallery');
+const $loadText = document.querySelector('#load-text');
+const $loadMore = document.querySelector('#load-more');
 
 export const showLoading = () => {
-  $gallery.innerHTML = '<p id="loading">Loading...</p>';
+  $loadMore.classList.add('loading')
 };
 
 export const clearLoading = () => {
-  $gallery.innerHTML = '';
+  $loadMore.classList.remove('loading')
 };
 
-export const renderImages = (images, isNew = true) => {
-  if (isNew) $gallery.innerHTML = '';
-
-  if (images.length === 0) {
+export const renderImages = (images) => {
+  if (!images || images.length === 0) {
     iziToast.error({
       message: 'Sorry, there are no images matching your search query. Please try again!',
       position: 'topRight',
     });
+    render.clearLoading();
+    hiddenButtonLoadMore(true);
     return;
   }
 
@@ -46,4 +48,8 @@ export const renderImages = (images, isNew = true) => {
 
   const lightbox = new SimpleLightbox('.gallery a');
   lightbox.refresh();
+};
+
+export const clearGallery = () => {
+  $gallery.innerHTML = '';
 };

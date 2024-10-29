@@ -1,9 +1,12 @@
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
 import * as api from './js/pixabay-api';
 import * as render from './js/render-functions';
 
 const $searchForm = document.querySelector('#search-form');
 const $loadMore = document.querySelector('#load-more');
-const $loadText = document.querySelector('#load-text');
+
 let parsedWords = '';
 let page = 1;
 
@@ -12,6 +15,7 @@ $searchForm.onsubmit = async event => {
     event.stopPropagation();
     event.preventDefault();
 
+    page = 1;
     const data = new FormData(event.target);
     const search = data.get('search');
     parsedWords = search.trim().split(' ').join('+');
@@ -24,55 +28,48 @@ $searchForm.onsubmit = async event => {
       return;
     }
 
+    render.clearGallery();
     render.showLoading();
-    const images = await api.search(parsedWords, page);
+    const { hits } = await api.search(parsedWords, page);
 
-    if (images.length) { 
-      render.renderImages(images);
-      hiddenButtonLoadMore(false);
-    }
-
-    if (!images.length) {
+    if (hits?.length) { 
+      render.renderImages(hits);
+    } else {
       iziToast.error({ 
         message: 'Sorry, there are no images matching your search query. Please try again!',
         position: 'topRight'
       });
-
-      render.clearLoading();
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    render.clearLoading();
   }
 };
 
 
 $loadMore.onclick = async () => {
   try {
-    hiddenButtonLoadMore(true);
-    $loadText.hidden = false
+    render.showLoading();
 
     page += 1;
-    const images = await api.search(parsedWords, page);
-    if (images) { 
-      render.renderImages(images, false);
-      hiddenButtonLoadMore(false);
+    const { hits, totalHits } = await api.search(parsedWords, page);
+    if (hits?.length) { 
+      render.renderImages(hits);
       $loadMore.scrollIntoView({ behavior: "smooth", block: "end" });
     }
 
-    if (!images.length) {
+    if (!api.isHasNextPage(page, totalHits)) {
       iziToast.info({ 
         message: 'We\'re sorry, but you\'ve reached the end of search results.',
         position: 'topRight'
       });
+      $loadMore.hidden = true;
     }
 
   } catch (error) {
     console.error(error);
   } finally {
-    $loadText.hidden = true
+    render.clearLoading();
   }
-}
-
-function hiddenButtonLoadMore(bool = false) {
-  $loadMore.hidden = bool;
 }

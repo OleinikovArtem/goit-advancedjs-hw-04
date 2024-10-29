@@ -71,6 +71,18 @@ button:hover {
   gap: 0;
 }
 
+.gallery:empty + #load-more {
+  display: none;
+}
+
+#load-more.loading {
+  display: none;
+}
+
+#load-more.loading + #load-text {
+  display: block;
+}
+
 @media (min-width: 900px) {
   .gallery {
     grid-template-columns: repeat(3, 1fr);
