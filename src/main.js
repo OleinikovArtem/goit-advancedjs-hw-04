@@ -60,7 +60,7 @@ $loadMore.onclick = async () => {
       $loadMore.scrollIntoView({ behavior: "smooth", block: "end" });
     }
 
-    if (!api.isHasNextPage(page, totalHits)) {
+    if (!api.isHasNextPage(totalHits, page)) {
       iziToast.info({ 
         message: 'We\'re sorry, but you\'ve reached the end of search results.',
         position: 'topRight'
